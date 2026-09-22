@@ -25,7 +25,7 @@ test.describe("Storefront UI", () => {
   );
 
   test(
-    "registers, logs out, rejects a wrong password and restores login",
+    "supports registration, logout and login",
     { tag: "@regression" },
     async ({ authPage, page, nav }) => {
       const user = newUser();

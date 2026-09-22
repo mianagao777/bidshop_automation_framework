@@ -1,73 +1,99 @@
-# Plan: 10% off orders with subtotal over NZD 100
+# Discount Feature Plan
 
-This is a proposed feature, not an implemented change. Resolve BUG-001 before
-adding more pricing logic.
+## Questions
 
-## Clarify before development
+Before testing, I would confirm a few things with Product and developers:
 
-- Does “over 100” mean strictly >100, and is subtotal before GST, delivery and other
-  discounts? Proposed assumption: merchandise subtotal excluding GST, strictly >100.
-- Does 10% apply to the entire qualifying subtotal or only the amount above 100?
-  Proposed assumption: entire merchandise subtotal.
-- Is the benefit automatic, for all customers and products, with no cap? Can it
-  stack with coupons, negotiated prices or future promotions?
-- Does GST apply to the discounted subtotal? Agree rounding per line versus order,
-  tie-breaking and the order of rounding with product/finance stakeholders.
-- Is eligibility recalculated at checkout after stock/price changes? How should
-  refunds, partial cancellations, promotion dates and existing carts behave?
-- What should the UI show when cart changes cross the threshold? Who approves a
-  changed quote before submission?
+- Does "over $100" mean $100.00 itself does not get the discount?
+- Is the $100 based on subtotal before GST?
+- Is the discount applied before or after GST?
+- Does the discount apply to all products?
+- Can it be combined with other discounts in future?
+- What rounding rule should be used?
 
-## Proposed changes (subject to those decisions)
+## Changes
 
-API: centralize authoritative pricing for GET/mutations of cart and POST order.
-Recompute eligibility server-side at checkout; never trust a client discount.
-Use integer cents or a decimal money library with one agreed rounding rule.
-Expose `subtotal`, `discountRate`, `discountAmount`, `discountedSubtotal`, `gst`,
-`total` and pricing/promotion version. Update OpenAPI schemas and examples.
-Preserve the meaning of existing `subtotal` as pre-discount to avoid silent drift.
-Validate stock before any mutation; keep checkout atomic.
+### API
 
-Data: persist the order's applied rate, discount amount, taxable base, GST, total
-and promotion/version as immutable purchase-time snapshots. Old orders stay
-unchanged; any future persistent storage migration defaults missing discount to
-zero. This demo has in-memory storage, so there is currently no DB migration.
+The backend should calculate the discount because it should be the source of truth for pricing.
 
-UI: render a distinct discount line and matching amounts on cart, checkout and
-confirmation; explain qualification and update immediately after quantity changes.
-Use server pricing instead of reimplementing eligibility in React. Handle changed
-quotes explicitly if checkout reprices an order.
+For a qualifying order, the cart/order response should include the discount separately, for example:
 
-Example under the proposed assumptions: subtotal 120.00 → discount 12.00 →
-taxable subtotal 108.00 → GST 16.20 → total 124.20. This example requires product
-approval and is not a claim that the current application supports discounts.
+```json
+{
+  "subtotal": 120,
+  "discount": 12,
+  "gst": 16.2,
+  "total": 124.2
+}
+```
+
+The exact GST calculation would depend on the agreed rule.
+
+### Data model
+
+For orders, I would store the discount value so the final price is kept with the order.
+
+For example:
+
+- `discountAmount`
+- `discountRate`
+
+### UI
+
+The discount should be shown clearly in the cart, checkout and order confirmation.
+
+For example:
+
+```text
+Subtotal        $120.00
+Discount 10%    -$12.00
+GST             $16.20
+Total           $124.20
+```
+
+The amount should update if the customer changes the cart quantity.
 
 ## Test strategy
 
-API boundaries: 99.99 and 100.00 receive zero discount; 100.01 qualifies. Use
-explicit test fixtures capable of producing exact cent values; do not assume the
-existing seed catalogue can produce every boundary. Test an ordinary 120.00
-order, rounding-sensitive values, multiple lines, quantity changes crossing the
-threshold in both directions, empty cart, invalid inputs and insufficient stock.
-Assert discount, GST and total against independently calculated expected values.
-Verify the persisted snapshot, cleared cart and exact inventory decrement;
-rejected checkout must change none of those. Test tampered client-supplied discount
-fields, order ownership and unchanged history after a later promotion change.
+I would cover most of the calculation rules at API level.
 
-UI: below-threshold purchase, qualifying purchase and quantity adjustment across
-the boundary. Assert displayed discount/quote/confirmation match server values;
-retain a full browser purchase rather than duplicating every API edge case.
+Main cases:
 
-Regression: run existing auth/catalogue/cart/checkout/stock tests; assert unchanged
-pricing for nonqualifying orders and unchanged stock quantities for qualifying
-ones. Existing purchase fixtures are below 100 and must continue to pass after
-BUG-001 is fixed. Update schemas and consumers together with compatibility checks.
+- below $100 -> no discount
+- exactly $100 -> no discount
+- just over $100 -> 10% discount
+- over $100 -> correct discount and total
+- reduce quantity below $100 -> discount removed
+- increase quantity over $100 -> discount applied
 
-## Before shipping
+I would also check that the discount, GST and final total are saved correctly in the order.
 
-Agree acceptance examples, rounding and rollout ownership. Require BUG-001 and
-all new pricing tests to pass without expected-failure annotations. Review UI
-wording and backward compatibility. Add a feature flag/kill switch if the real
-service supports staged rollout, observe quote-versus-order discrepancies and
-redemption totals, and define rollback: disable future discounts while preserving
-already-confirmed order snapshots. Release only after acceptance review.
+For UI, I would keep the coverage smaller:
+
+- one order that gets the discount
+- one order that does not
+- checkout total matches the final order total
+
+## Regression
+
+I would rerun the existing cart and order tests, especially:
+
+- cart totals
+- GST calculation
+- quantity changes
+- checkout
+- stock reduction
+- cart clearing
+- order details
+
+Orders below $100 should still work the same as before.
+
+## Before release
+
+Before shipping, I would want:
+
+- the calculation and rounding rules confirmed
+- API boundary tests automated
+- at least one UI end-to-end discount test
+- existing pricing regression passing

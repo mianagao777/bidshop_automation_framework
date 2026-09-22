@@ -4,7 +4,7 @@ import type { Cart, Product } from "../../src/api.types";
 
 test.describe("Purchase flow UI", () => {
   test(
-    "buys a product and shows a persisted order with a cleared cart",
+    "completes a purchase and clears the cart",
     { tag: ["@regression", "@smoke"] },
     async ({
       home,

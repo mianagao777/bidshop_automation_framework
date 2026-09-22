@@ -6,7 +6,7 @@ import type { AuthResponse, Cart, Product } from "../../src/api.types";
 
 test.describe("Order API", () => {
   test(
-    "rejects invalid delivery details without side effects",
+    "rrejects invalid delivery details and keeps the order state unchanged",
     { tag: "@regression" },
     async ({ cart, orders, products }) => {
       const productResponse = await products.get("p-001");
@@ -88,7 +88,7 @@ test.describe("Order API", () => {
   );
 
   test(
-    "rejects stale checkout without partial side effects",
+    "rejects checkout when stock is no longer available",
     { tag: "@regression" },
     async ({ cart, orders, products, auth, api }) => {
       // Dedicated SKU: other tests never purchase p-003. Read stock to allow repeats.

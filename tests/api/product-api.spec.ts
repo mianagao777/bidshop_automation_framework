@@ -3,7 +3,7 @@ import type { Product } from "../../src/api.types";
 
 test.describe("Product API", () => {
   test(
-    "filters products by description and inclusive price boundaries",
+    "filters products by search, category and price",
     { tag: ["@regression", "@smoke"] },
     async ({ products }) => {
       const response = await products.list({
