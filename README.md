@@ -18,11 +18,11 @@ I chose Playwright because it supports API and browser testing in the same frame
 ├── tests/
 │   ├── api/           # API tests
 │   └── ui/            # UI tests
-│
-├── env.ts             # Test service ports and URLs
-├── playwright.config.ts
-├── package.json
-├── BUGS.md
+├── env.ts                # Test URLs and ports
+├── playwright.config.ts  # Playwright test configuration
+├── tsconfig.json         # TypeScript configuration
+├── package.json          # Dependencies and scripts
+├── package-lock.json     # Locked dependency versions
 ├── README.md
 └── DISCOUNT.md
 ```
@@ -55,3 +55,5 @@ npm run report            # open Playwright HTML report
 I kept the suite focused on the main business flows rather than trying to cover every possible case.
 
 With more time, I would add more API boundary and error scenarios, more UI negative coverage, response schema validation, and broader browser coverage.
+
+Known product issues found during testing are marked with `@known-bug` and `test.fail()`.
