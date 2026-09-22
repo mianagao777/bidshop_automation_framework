@@ -1,0 +1,23 @@
+{
+  "name": "bidshop-automation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bidshop API and browser acceptance tests",
+  "scripts": {
+    "test": "playwright test",
+    "test:api": "playwright test --project=api",
+    "test:ui": "playwright test --project=ui",
+    "typecheck": "tsc --noEmit",
+    "report": "playwright show-report",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:regression": "playwright test --grep @regression"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.0"
+  }
+}
