@@ -29,11 +29,9 @@ I chose Playwright because it supports API and browser testing in the same frame
 
 ## Getting Started
 
-Prerequisite: **Node.js 20+**
+Prerequisite: **Node.js 20+**. This repository contains the automation tests only.
 
-This repository contains the automation tests only.
-
-Start the Bidshop services from the original application repository:
+- Start the Bidshop services from the original application repository:
 
 ```bash
 # Terminal 1
@@ -45,14 +43,14 @@ cd frontend && npm install && npm run dev
 
 The tests expect the API at `http://localhost:4000` and the UI at `http://localhost:5173`.
 
-Install the automation dependencies:
+### Install the automation dependencies:
 
-````bash
+```bash
 npm install
 npx playwright install chromium
+```
 
-
-## Running the Tests
+### Running the Tests
 
 ```bash
 npm test                  # run all tests
@@ -62,7 +60,7 @@ npm run test:smoke        # run smoke tests
 npm run test:regression   # run regression tests
 npm run typecheck         # TypeScript check
 npm run report            # open Playwright HTML report
-````
+```
 
 `@smoke` covers the main critical flows, while `@regression` covers the wider suite. Known product issues use `@known-bug` with `test.fail()`.
 
