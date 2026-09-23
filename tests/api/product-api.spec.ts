@@ -35,4 +35,14 @@ test.describe("Product API", () => {
       expect(await response.json()).toEqual({ count: 0, items: [] });
     },
   );
+
+  test(
+    "returns 404 for a non-existent product",
+    { tag: "@regression" },
+    async ({ products }) => {
+      const response = await products.get("p-does-not-exist");
+
+      expect(response.status()).toBe(404);
+    },
+  );
 });

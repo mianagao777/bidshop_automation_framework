@@ -28,7 +28,7 @@ For a qualifying order, the cart/order response should include the discount sepa
 }
 ```
 
-The exact GST calculation would depend on the agreed rule.
+The exact GST calculation would depend on the agreed rule.For monetary calculations, I would avoid relying on floating-point values and agree the rounding rule before implementation.
 
 ### Data model
 
@@ -94,6 +94,7 @@ Orders below $100 should still work the same as before.
 Before shipping, I would want:
 
 - the calculation and rounding rules confirmed
+- enough logging to investigate pricing or discount issues
 - API boundary tests automated
 - at least one UI end-to-end discount test
 - existing pricing regression passing

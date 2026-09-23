@@ -13,7 +13,7 @@
     "test:regression": "playwright test --grep @regression"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=20"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.0",

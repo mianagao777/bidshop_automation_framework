@@ -1,4 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
+import type { NavBar } from "./NavBar";
 
 export class AuthPage {
   readonly registerNameInput: Locator;
@@ -9,9 +10,11 @@ export class AuthPage {
   readonly loginPasswordInput: Locator;
   readonly loginButton: Locator;
   readonly loginError: Locator;
-  readonly logoutButton: Locator;
 
-  constructor(private readonly page: Page) {
+  constructor(
+    private readonly page: Page,
+    private readonly navBar: NavBar,
+  ) {
     this.registerNameInput = page.getByTestId("register-name");
     this.registerEmailInput = page.getByTestId("register-email");
     this.registerPasswordInput = page.getByTestId("register-password");
@@ -20,7 +23,6 @@ export class AuthPage {
     this.loginPasswordInput = page.getByTestId("login-password");
     this.loginButton = page.getByTestId("login-submit");
     this.loginError = page.getByTestId("login-error");
-    this.logoutButton = page.getByTestId("nav-logout");
   }
 
   async register(user: { name: string; email: string; password: string }) {
@@ -40,6 +42,6 @@ export class AuthPage {
   }
 
   async logout() {
-    await this.logoutButton.click();
+    await this.navBar.logout.click();
   }
 }

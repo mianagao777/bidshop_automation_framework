@@ -40,8 +40,8 @@ export const test = base.extend<Fixtures>({
     await use(new ProductClient(api));
   },
 
-  authPage: async ({ page }, use) => {
-    await use(new AuthPage(page));
+  authPage: async ({ page, nav }, use) => {
+    await use(new AuthPage(page, nav));
   },
 
   home: async ({ page }, use) => {

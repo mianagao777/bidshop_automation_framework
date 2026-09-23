@@ -1,7 +1,7 @@
 import type { Locator, Page } from "@playwright/test";
 
 // A product card component, not a separate route.
-export class ProductPage {
+export class ProductCard {
   readonly loginLink: Locator;
   readonly card: Locator;
   readonly message: Locator;

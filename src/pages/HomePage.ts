@@ -1,5 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
-import { ProductPage } from "./ProductPage";
+import { ProductCard } from "./ProductCard";
 
 export class HomePage {
   readonly searchInput: Locator;
@@ -29,6 +29,6 @@ export class HomePage {
   }
 
   product(id: string) {
-    return new ProductPage(this.page, id);
+    return new ProductCard(this.page, id);
   }
 }

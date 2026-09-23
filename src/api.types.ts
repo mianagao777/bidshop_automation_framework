@@ -29,13 +29,7 @@ export interface Cart {
   gst: number;
   total: number;
 }
-export type OrderStatus =
-  | "pending"
-  | "paid"
-  | "shipped"
-  | "delivered"
-  | "cancelled"
-  | "refunded";
+export type OrderStatus = "PENDING" | "CONFIRMED";
 
 export interface CustomerInfo {
   name: string;
