@@ -10,7 +10,4 @@ export class ProductClient extends BaseClient {
   get(id: string): Promise<APIResponse> {
     return this.request.get(`/products/${encodeURIComponent(id)}`);
   }
-  categories(): Promise<APIResponse> {
-    return this.request.get("/products/categories");
-  }
 }

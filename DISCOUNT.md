@@ -1,77 +1,51 @@
-# Discount Feature Plan
+## Discount Feature Plan
 
-## Questions
+### Clarifying questions
 
-Before testing, I would confirm a few things with Product and developers:
+Before testing, I would confirm:
 
-- Does "over $100" mean $100.00 itself does not get the discount?
-- Is the discount applied before or after GST?
-- Does the discount apply to all products?
-- Can it be combined with other discounts?
+- Does "over $100" mean $100.00 itself does not qualify?
+- Is the threshold based on subtotal before GST?
+- Is GST calculated before or after the discount?
+- Can the discount be combined with other discounts?
 - What rounding rule should be used?
-- If an order is partially refunded or returned, how should the discount be recalculated?
+- Should the discount be shown separately in the cart, order details and invoice?
+- How should future returns or refunds affect the discount?
 
-## Changes
+### Changes
 
-### API
+**API / backend**
 
-The backend should calculate the discount because it should be the source of truth for pricing.
+The backend should calculate the discount so pricing has one source of truth. Cart and order responses should expose `subtotal`, `discount`, `gst` and `total`. The pricing logic should be kept in one reusable backend calculation rather than duplicated in the UI.
 
-The cart and order responses should include the discount separately, such as `discountRate` and `discountAmount`, alongside `subtotal`, `gst` and `total`.
+**Data model**
 
-The exact GST calculation would depend on the agreed rule. For monetary calculations, I would avoid relying on floating-point values and agree the rounding rule before implementation.
+Add the discount amount to the cart/order pricing model so the applied discount is persisted and can be shown consistently later.
 
-### Data model
+**UI**
 
-For completed orders, I would store `discountAmount` and `discountRate` with the pricing breakdown.
+Show the discount as a separate line in the cart/checkout summary and use the values returned by the API rather than recalculating pricing in the browser.
 
-### UI
+### Test strategy
 
-The discount should be shown clearly in the cart, checkout and order confirmation.
+At API level, I would focus on pricing boundaries and calculation accuracy:
 
-The displayed pricing should update when the customer changes the cart quantity.
+- $99.99 → no discount
+- $100.00 → no discount, assuming "over $100" is strict
+- $100.01 → 10% discount
+- Verify subtotal, discount, GST and total use the agreed calculation and rounding rules.
+- Verify changing cart quantity recalculates the discount correctly.
 
-## Test strategy
+At UI level, I would keep coverage small:
 
-I would cover most pricing rules at API level and keep the UI coverage smaller.
+- Verify the discount appears/disappears when the cart crosses the threshold.
+- Verify the displayed total matches the API result.
+- Cover one end-to-end discounted purchase and confirm the final order keeps the same pricing.
 
-Main cases:
+### Regression and release
 
-- below $100 -> no discount
-- exactly $100 -> no discount
-- just over $100 -> 10% discount
-- over $100 -> correct discount, GST and total
-- reduce quantity below the threshold -> discount removed
-- increase quantity above the threshold -> discount applied
+I would rerun the existing cart, order and purchase-flow tests to make sure non-qualifying orders still calculate correctly and that stock deduction, cart clearing and order persistence are unchanged.
 
-I would also verify that the applied discount, GST and final total are stored correctly in the final order.
+Before release, I would want the pricing and rounding rules agreed, automated regression passing, and enough logging/monitoring to investigate incorrect discount calculations.
 
-For UI, I would keep the coverage smaller:
-
-- one order that gets the discount
-- one order that does not
-- checkout total matches the final order total
-
-## Regression
-
-I would rerun the existing pricing and checkout coverage, especially:
-
-- cart totals
-- GST calculation
-- quantity changes
-- checkout
-- stock reduction
-- cart clearing
-- order details
-
-Orders below $100 should still work the same as before.
-
-## Before release
-
-Before shipping, I would want:
-
-- calculation and rounding rules confirmed
-- API boundary tests automated
-- at least one UI end-to-end discount test
-- existing pricing regression passing
-- enough logging to investigate pricing or discount issues
+For existing orders, the new field should have a default value or migration strategy so older records remain backward-compatible.

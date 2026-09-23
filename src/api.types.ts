@@ -14,13 +14,18 @@ export interface Product {
   description: string;
   category: string;
   price: number;
+  unit: string;
   stock: number;
+  imageUrl: string;
 }
 export interface CartLine {
   productId: string;
   quantity: number;
+  name: string;
+  unit: string;
   unitPrice: number;
   lineTotal: number;
+  imageUrl?: string;
 }
 export interface Cart {
   userId: string;
@@ -28,13 +33,16 @@ export interface Cart {
   subtotal: number;
   gst: number;
   total: number;
+  updatedAt: string;
 }
 export type OrderStatus = "PENDING" | "CONFIRMED";
 
 export interface CustomerInfo {
   name: string;
   email: string;
-  phone?: string;
+  address: string;
+  city: string;
+  postcode: string;
 }
 
 export interface Order {
@@ -46,4 +54,5 @@ export interface Order {
   subtotal: number;
   gst: number;
   total: number;
+  createdAt: string;
 }

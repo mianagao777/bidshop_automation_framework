@@ -1,8 +1,9 @@
 import type { APIResponse } from "@playwright/test";
 import { BaseClient } from "./BaseClient";
+import type { CustomerInfo } from "../api.types";
 
 export class OrderClient extends BaseClient {
-  create(customer: Record<string, unknown>): Promise<APIResponse> {
+  create(customer: CustomerInfo): Promise<APIResponse> {
     return this.request.post("/orders", {
       headers: this.authHeaders,
       data: { customer },

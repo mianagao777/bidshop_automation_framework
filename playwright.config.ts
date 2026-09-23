@@ -1,5 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
-import { apiURL, uiURL } from "./env";
+import { uiURL } from "./env";
 
 export default defineConfig({
   testDir: "./tests",
@@ -20,7 +20,7 @@ export default defineConfig({
     video: "retain-on-failure",
   },
   projects: [
-    { name: "api", testMatch: "**/api/*.spec.ts", use: { baseURL: apiURL } },
+    { name: "api", testMatch: "**/api/*.spec.ts" },
     {
       name: "ui",
       testMatch: "**/ui/*.spec.ts",

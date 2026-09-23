@@ -3,14 +3,12 @@ import type { Locator, Page } from "@playwright/test";
 export class CartPage {
   readonly subtotal: Locator;
   readonly empty: Locator;
-  readonly loginRequired: Locator;
   readonly checkoutButton: Locator;
   readonly clearButton: Locator;
 
   constructor(private readonly page: Page) {
     this.subtotal = page.getByTestId("cart-subtotal");
     this.empty = page.getByTestId("cart-empty");
-    this.loginRequired = page.getByTestId("cart-login-required");
     this.checkoutButton = page.getByTestId("cart-checkout");
     this.clearButton = page.getByTestId("cart-clear");
   }

@@ -1,8 +1,19 @@
 import { test, expect } from "../../src/fixtures/authenticated.fixture";
-import { shippingDetails as customer } from "../../src/utils/testdata";
-import type { Cart, Product } from "../../src/api.types";
+import { OrderClient } from "../../src/clients/OrderClient";
+import { newUser, shippingDetails as customer } from "../../src/utils/testdata";
+import type { AuthResponse, Cart, Order, Product } from "../../src/api.types";
 
 test.describe("Order API", () => {
+  test(
+    "rejects checkout with an empty cart",
+    { tag: "@regression" },
+    async ({ orders }) => {
+      const response = await orders.create(customer);
+
+      expect(response.status()).toBe(400);
+    },
+  );
+
   test(
     "rejects invalid delivery details and keeps the order state unchanged",
     { tag: "@regression" },
@@ -53,7 +64,7 @@ test.describe("Order API", () => {
       const response = await orders.create(customer);
       expect(response.status()).toBe(201);
 
-      const order = await response.json();
+      const order: Order = await response.json();
       expect(order).toMatchObject({
         id: expect.any(String),
         userId: account.user.id,
@@ -85,4 +96,24 @@ test.describe("Order API", () => {
     },
   );
 
+  test(
+    "prevents another customer from reading an order",
+    { tag: "@regression" },
+    async ({ api, auth, cart, orders }) => {
+      const addResponse = await cart.add("p-001", 1);
+      expect(addResponse.status()).toBe(201);
+
+      const createResponse = await orders.create(customer);
+      expect(createResponse.status()).toBe(201);
+      const order: Order = await createResponse.json();
+
+      const registrationResponse = await auth.register(newUser());
+      expect(registrationResponse.status()).toBe(201);
+      const intruder: AuthResponse = await registrationResponse.json();
+
+      const response = await new OrderClient(api, intruder.token).get(order.id);
+
+      expect(response.status()).toBe(404);
+    },
+  );
 });

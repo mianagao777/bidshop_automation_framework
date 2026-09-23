@@ -1,4 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
+import type { CustomerInfo } from "../api.types";
 
 export class CheckoutPage {
   readonly nameInput: Locator;
@@ -21,7 +22,7 @@ export class CheckoutPage {
     this.submitButton = page.getByTestId("checkout-submit");
   }
 
-  async fill(customer: Record<string, string>) {
+  async fill(customer: CustomerInfo) {
     await this.nameInput.fill(customer.name);
     await this.emailInput.fill(customer.email);
     await this.addressInput.fill(customer.address);
